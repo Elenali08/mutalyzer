@@ -43,7 +43,8 @@ apt-get install -y \
   apache2 \
   libapache2-mod-wsgi \
   python-setuptools \
-  git-core
+  git-core \
+  swig
 
 echo -e "${COLOR_INFO}Installing known-working spyne from git${COLOR_END}"
 
@@ -57,3 +58,11 @@ popd
 echo -e "${COLOR_INFO}Installing suds using easy_install${COLOR_END}"
 
 easy_install suds
+
+echo -e "${COLOR_INFO}Installing extractor from git${COLOR_END}"
+
+# For now, the extractor package is only available from our GitLab server.
+pushd $(mktemp -d)
+git clone https://git.lumc.nl/mutalyzer/extractor.git .
+python setup.py install
+popd

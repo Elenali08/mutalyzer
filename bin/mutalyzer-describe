@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+"""
+Command-line interface to the description extractor.
+
+Usage:
+  {command} s1 s2
+
+  s1, s2: DNA sequences to compare.
+
+Example:
+  {command} ATAGATGATAGATAGATAGAT ATAGATGATTGATAGATAGAT
+
+Example:
+  {command} \\
+    ACGCTCGATCGCTTATAGCATGGGGGGGGGATCTAGCTCTCTCTATAAGATA \\
+    ACGCTCGATCGCTTATACCCCCCCCATGCGATCTAGCTCTCTCTATAAGATA
+
+
+Todo: Handle non-DNA strings, for example:
+
+- MAVLWRLSAVCGALGGRALLLRTPVVRPAH
+  MAVLWRLSAVCGALGGRALLLRTPVVRPAH
+- MDYSLAAALTLHGHWGLGQVVTDYVHGDALQKAAKAGLLALSALTFAGLCYFNYHDVGICKAVAMLWKL
+  MDYSLAAALTFMVTGALDKLLLTMFMGMPCRKLPRQGFWHFQL
+- VVSVLLLGLLPAAYLNPCSAMYYSLAAALTLHGHWGLGQV
+  VVSVLLLGLLPAAYLNPCSAMDYSLAAALTLHGHWGLGQV
+"""
+
+
+import sys
+
+from mutalyzer.describe import allele_description, describe
+from mutalyzer.util import format_usage
+
+
+def main(s1, s2):
+    """
+    Command-line interface to the description extractor.
+    """
+    print allele_description(describe(s1, s2))
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        print format_usage()
+        sys.exit(1)
+    main(*sys.argv[1:])

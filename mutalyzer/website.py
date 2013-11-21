@@ -859,9 +859,9 @@ class Check:
             extracted = extractedProt = '(skipped)'
 
             if allele:
-                extracted = describe.alleleDescription(allele)
+                extracted = describe.allele_description(allele)
             if prot_allele:
-                extractedProt = describe.alleleDescription(prot_allele)
+                extractedProt = describe.allele_description(prot_allele)
 
         else:
             extracted = extractedProt = ''
@@ -964,7 +964,7 @@ class DescriptionExtractor:
                 "Variant sequence is not DNA.")
 
         result = describe.describe(referenceSeq, variantSeq)
-        description = describe.alleleDescription(result)
+        description = describe.allele_description(result)
 
         errors, warnings, summary = output.Summary()
 
