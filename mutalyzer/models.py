@@ -103,6 +103,10 @@ class RawVar(ComplexModel):
     start_offset = Mandatory.Integer
     end = Mandatory.Integer
     end_offset = Mandatory.Integer
+    sample_start = Mandatory.Integer
+    sample_start_offset = Mandatory.Integer
+    sample_end = Mandatory.Integer
+    sample_end_offset = Mandatory.Integer
     type = Mandatory.String
     deleted = Mandatory.String
     inserted = Mandatory.String
