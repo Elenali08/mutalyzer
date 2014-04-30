@@ -169,6 +169,10 @@ class Seq(object):
         self.start = start
         self.end = end
         self.reverse = reverse
+
+        self.type = "trans"
+        if self.sequence:
+            self.type = "ins"
     #__init__
 
     def __str__(self):
