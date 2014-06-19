@@ -21,10 +21,11 @@ def make_fs_tables(table_id):
     a different reading frame. Do this for both alternative reading frames (+1
     and +2).
 
-    @arg table_id: Coding table ID.
-    @type table_id: int
-    @returns: Two dictionaries for the two alternative reading frames.
-    @rtype: tuple(dict, dict)
+    :arg table_id: Coding table ID.
+    :type table_id: int
+
+    :returns: Two dictionaries for the two alternative reading frames.
+    :rtype: tuple(dict, dict)
     """
     # Make the forward translation table.
     table = dict(CodonTable.unambiguous_dna_by_id[table_id].forward_table)
@@ -53,10 +54,11 @@ def _peptide_overlaps(peptide):
     """
     Make a list of overlapping 2-mers of {peptide} in order of appearance.
 
-    @arg peptide: A peptide sequence.
-    @type peptide: str
-    @returns: All 2-mers of {peptide} in order of appearance.
-    @rtype: list(str)
+    :arg peptide: A peptide sequence.
+    :type peptide: str
+
+    :returns: All 2-mers of {peptide} in order of appearance.
+    :rtype: list(str)
     """
     return map(lambda x: peptide[x:x+2], range(len(peptide) - 1))
 #_peptide_overlaps
@@ -65,14 +67,14 @@ def _options(peptide_overlaps, peptide_prefix, fs, output):
     """
     Enumerate all peptides that could result from a frame shift.
 
-    @arg peptide_overlaps: List of overlapping 2-mers of a peptide.
-    @type peptide_overlaps: list(str)
-    @arg peptide_prefix: Prefix of a peptide in the alternative reading frame.
-    @type peptide_prefix: str
-    @arg fs: Frame shift table.
-    @type fs: dict
-    @arg output: List of peptides, should be empty initially.
-    @type output: list(str)
+    :arg peptide_overlaps: List of overlapping 2-mers of a peptide.
+    :type peptide_overlaps: list(str)
+    :arg peptide_prefix: Prefix of a peptide in the alternative reading frame.
+    :type peptide_prefix: str
+    :arg fs: Frame shift table.
+    :type fs: dict
+    :arg output: List of peptides, should be empty initially.
+    :type output: list(str)
     """
     if not peptide_overlaps:
         output.append(peptide_prefix)
@@ -86,10 +88,13 @@ def enum_fs(peptide, fs):
     """
     Enumerate all peptides that could result from a frame shift.
 
-    @arg peptide: Original peptide sequence.
-    @type peptide: str
-    @arg fs: Frame shift table.
-    @type fs: dict
+    :arg peptide: Original peptide sequence.
+    :type peptide: str
+    :arg fs: Frame shift table.
+    :type fs: dict
+
+    :returns: List of peptides that could result from a frame shift.
+    :rtype: list(str)
     """
     output = []
 
@@ -102,12 +107,15 @@ def fit_fs(peptide, alternative_peptide, fs):
     Check whether peptide {alternative_peptide} is a possible frame shift of
     peptide {peptide}.
 
-    @arg peptide: Original peptide sequence.
-    @type peptide: str
-    @arg alternative_peptide: Observed peptide sequence.
-    @type alternative_peptide: str
-    @arg fs: Frame shift table.
-    @type fs: dict
+    :arg peptide: Original peptide sequence.
+    :type peptide: str
+    :arg alternative_peptide: Observed peptide sequence.
+    :type alternative_peptide: str
+    :arg fs: Frame shift table.
+    :type fs: dict
+
+    :returns: Whether {alternative_peptide} is a frameshift of {peptide}.
+    :rtype: bool
     """
     # Todo: This is a temporary fix to prevent crashing on frameshift
     #     detection (I think bug #124).
@@ -129,15 +137,15 @@ def find_fs(peptide, alternative_peptide, fs):
     Find the longest part of {alternative_peptide} that fits in {peptide} in a
     certain frame given by {fs}.
 
-    @arg peptide: Original peptide sequence.
-    @type peptide: str
-    @arg alternative_peptide: Observed peptide sequence.
-    @type alternative_peptide: str
-    @arg fs: Frame shift table.
-    @type fs: dict
+    :arg peptide: Original peptide sequence.
+    :type peptide: str
+    :arg alternative_peptide: Observed peptide sequence.
+    :type alternative_peptide: str
+    :arg fs: Frame shift table.
+    :type fs: dict
 
-    @returns: The length and the offset in {peptide} of the largest frameshift.
-    @rtype: tuple(int, int)
+    :returns: The length and the offset in {peptide} of the largest frameshift.
+    :rtype: tuple(int, int)
     """
     peptide_overlaps = _peptide_overlaps(peptide)
     max_fs = 0
@@ -222,30 +230,30 @@ class RawVar(models.RawVar):
         """
         Initialise the class with the appropriate values.
 
-        @arg start: Start position.
-        @type start: int
-        @arg start_offset:
-        @type start_offset: int
-        @arg end: End position.
-        @type end: int
-        @arg end_offset:
-        @type end_offset: int
-        @arg sample_start: Start position.
-        @type sample_start: int
-        @arg sample_start_offset:
-        @type sample_start_offset: int
-        @arg sample_end: End position.
-        @type sample_end: int
-        @arg sample_end_offset:
-        @type sample_end_offset: int
-        @arg type: Variant type.
-        @type type: str
-        @arg deleted: Deleted part of the reference sequence.
-        @type deleted: str
-        @arg inserted: Inserted part.
-        @type inserted: object
-        @arg shift: Amount of freedom.
-        @type shift: int
+        :arg start: Start position.
+        :type start: int
+        :arg start_offset:
+        :type start_offset: int
+        :arg end: End position.
+        :type end: int
+        :arg end_offset:
+        :type end_offset: int
+        :arg sample_start: Start position.
+        :type sample_start: int
+        :arg sample_start_offset:
+        :type sample_start_offset: int
+        :arg sample_end: End position.
+        :type sample_end: int
+        :arg sample_end_offset:
+        :type sample_end_offset: int
+        :arg type: Variant type.
+        :type type: str
+        :arg deleted: Deleted part of the reference sequence.
+        :type deleted: str
+        :arg inserted: Inserted part.
+        :type inserted: object
+        :arg shift: Amount of freedom.
+        :type shift: int
         """
         # TODO: Will this container be used for all variants, or only genomic?
         #       start_offset and end_offset may be never used.
@@ -272,8 +280,8 @@ class RawVar(models.RawVar):
         """
         Give the HGVS description of the raw variant stored in this class.
 
-        @returns: The HGVS description of the raw variant stored in this class.
-        @rtype: str
+        :returns: The HGVS description of the raw variant stored in this class.
+        :rtype: str
         """
         if not self.start:
             return "="
@@ -301,8 +309,8 @@ class RawVar(models.RawVar):
         Note that this function relies on the absence of values to make the
         correct description. Also see the comment in the class definition.
 
-        @returns: The HGVS description of the raw variant stored in this class.
-        @rtype: str
+        :returns: The HGVS description of the raw variant stored in this class.
+        :rtype: str
         """
         if self.type == "unknown":
             return "?"
@@ -341,9 +349,9 @@ class RawVar(models.RawVar):
         Note that this function relies on the absence of values to make the
         correct description. Also see the comment in the class definition.
 
-        @returns: The standardised length of the HGVS description of the raw
+        :returns: The standardised length of the HGVS description of the raw
             variant stored in this class.
-        @rtype: int
+        :rtype: int
         """
         if not self.start: # `=' or `?'
             return 1
@@ -372,9 +380,9 @@ class RawVar(models.RawVar):
         Note that this function relies on the absence of values to make the
         correct description. Also see the comment in the class definition.
 
-        @returns: The standardised length of the HGVS description of the raw
+        :returns: The standardised length of the HGVS description of the raw
             variant stored in this class.
-        @rtype: int
+        :rtype: int
         """
         if not self.start: # =
             return 1
@@ -417,9 +425,9 @@ class RawVar(models.RawVar):
         Give the standardised length of the HGVS description of the raw variant
         stored in this class.
 
-        @returns: The standardised length of the HGVS description of the raw
+        :returns: The standardised length of the HGVS description of the raw
             variant stored in this class.
-        @rtype: int
+        :rtype: int
         """
         if self.dna:
             return self._dna_description_length()
@@ -431,11 +439,11 @@ def allele_description(allele):
     """
     Convert a list of raw variants to an HGVS allele description.
 
-    @arg allele: A list of raw variants representing an allele description.
-    @type allele: list(RawVar)
+    :arg allele: A list of raw variants representing an allele description.
+    :type allele: list(RawVar)
 
-    @returns: The HGVS description of {allele}.
-    @rval: str
+    :returns: The HGVS description of {allele}.
+    :rtype: str
     """
     if len(allele) > 1:
         return "[{}]".format(';'.join(map(lambda x: x.hgvs, allele)))
@@ -446,11 +454,11 @@ def allele_description_length(allele):
     """
     Calculate the standardised length of an HGVS allele description.
 
-    @arg allele: A list of raw variants representing an allele description.
-    @type allele: list(RawVar)
+    :arg allele: A list of raw variants representing an allele description.
+    :type allele: list(RawVar)
 
-    @returns: The standardised length of the HGVS description of {allele}.
-    @rval: int
+    :returns: The standardised length of the HGVS description of {allele}.
+    :rtype: int
     """
     # NOTE: Do we need to count the ; and [] ?
     return sum(map(lambda x: x.hgvs_length, allele))
@@ -561,13 +569,13 @@ def describe(s1, s2, dna=True):
     """
     Give an allele description of the change from {s1} to {s2}.
 
-    arg s1: Sequence 1.
-    type s1: str
-    arg s2: Sequence 2.
-    type s2: str
+    :arg s1: Sequence 1.
+    :type s1: str
+    :arg s2: Sequence 2.
+    :type s2: str
 
-    @returns: A list of RawVar objects, representing the allele.
-    @rval: list(RawVar)
+    :returns: A list of RawVar objects, representing the allele.
+    :rtype: list(RawVar)
     """
     description = []
 
