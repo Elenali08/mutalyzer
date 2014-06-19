@@ -283,7 +283,9 @@ class RawVar(models.RawVar):
         :returns: The HGVS description of the raw variant stored in this class.
         :rtype: str
         """
-        if not self.start:
+        if self.type == "unknown":
+            return "?"
+        if self.type == "none":
             return "="
 
         description = "{}".format(self.start)
@@ -314,7 +316,7 @@ class RawVar(models.RawVar):
         """
         if self.type == "unknown":
             return "?"
-        if not self.start:
+        if self.type == "none":
             return "="
 
         description = ""
@@ -353,18 +355,18 @@ class RawVar(models.RawVar):
             variant stored in this class.
         :rtype: int
         """
-        if not self.start: # `=' or `?'
+        if self.type in ("none", "unknown"): # `=' or `?'
             return 1
 
         description_length = 1 # Start position.
 
-        if self.end: # '_' and end position.
+        if self.start != self.end: # '_' and end position.
             description_length += 2
 
         if self.type != "subst":
             description_length += len(self.type)
 
-            if self.inserted:
+            if self.type in ("ins", "delins"):
                 return description_length + len(self.inserted)
             return description_length
         #if
