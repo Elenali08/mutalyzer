@@ -17,7 +17,12 @@ from .. import variantchecker
 
 class MyEncoder(JSONEncoder):
     def default(self, o):
-        return o.__dict__
+        json_object = o.__dict__
+        json_object.update({"hgvs": str(o)})
+
+        return json_object
+    #default
+#MyEncoder
 
 def check_name(description):
     """
