@@ -32,7 +32,7 @@ class TestDescribe(MutalyzerTest):
         assert_equal(result[0].sample_end, expected[4])
         assert_equal(result[0].deleted[0].sequence, expected[5])
         assert_equal(result[0].inserted[0].sequence, expected[6])
-        assert_equal(result[0].hgvs, expected[7])
+        assert_equal(str(result[0]), expected[7])
 
     def test1(self):
         """
