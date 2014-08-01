@@ -207,15 +207,14 @@ class Seq(object):
 
 class SeqList(list):
     def __str__(self):
-        representation = ';'.join(map(str, self))
-
         if len(self) > 1:
-            return "[{}]".format(representation)
-        return representation
+            return "[{}]".format(';'.join(map(str, self)))
+        return str(self[0])
     #__str__
 #SeqList
 
 class HGVSVar(object):
+    # NOTE: This may be obsolete, but check the JSON generation.
     def update(self):
         self.hgvs = str(self)
         self.hgvs_length = len(self)
@@ -316,6 +315,7 @@ class DNAVar(models.DNAVar, HGVSVar):
             variant stored in this class.
         :rtype: int
         """
+        # NOTE: Obsolete?
         if self.type in ("none", "unknown"): # `=' or `?'
             return 1
 
@@ -429,6 +429,7 @@ class ProteinVar(models.ProteinVar, HGVSVar):
             variant stored in this class.
         :rtype: int
         """
+        # NOTE: Obsolete?
         if not self.start: # =
             return 1
 
@@ -472,6 +473,7 @@ class Allele(list):
         :rtype: int
         """
         # NOTE: Do we need to count the ; and [] ?
+        # NOTE: Obsolete?
         return sum(map(lambda x: x.hgvs_length, self))
     #length
 #Allele
@@ -565,7 +567,61 @@ def var_to_rawvar(s1, s2, var, seq_list=[], container=DNAVar):
         sample_end=var.sample_end)
 #var_to_rawvar
 
-def describe(s1, s2, dna=True):
+def describe_dna(s1, s2):
+    """
+    Give an allele description of the change from {s1} to {s2}.
+
+    :arg s1: Sequence 1.
+    :type s1: str
+    :arg s2: Sequence 2.
+    :type s2: str
+
+    :returns: A list of RawVar objects, representing the allele.
+    :rtype: list(RawVar)
+    """
+    description = Allele()
+    in_transposition = 0
+
+    for variant in extractor.extract(str(s1), len(s1), str(s2), len(s2), 0):
+        print (variant.type, variant.reference_start,
+            variant.reference_end, variant.sample_start,
+            variant.sample_end, variant.transposition_start,
+            variant.transposition_end)
+        print (variant.type & extractor.TRANSPOSITION_OPEN, variant.type &
+            extractor.TRANSPOSITION_CLOSE)
+
+        if variant.type & extractor.TRANSPOSITION_OPEN:
+            if not in_transposition:
+                seq_list = SeqList()
+            in_transposition += 1
+        #if
+
+        if in_transposition:
+            if variant.type & extractor.IDENTITY:
+                seq_list.append(Seq(start=variant.transposition_start + 1,
+                    end=variant.transposition_end, reverse=False))
+            elif variant.type & extractor.REVERSE_COMPLEMENT:
+                seq_list.append(Seq(start=variant.transposition_start + 1,
+                    end=variant.transposition_end, reverse=True))
+            else:
+                seq_list.append(Seq(
+                    sequence=s2[variant.sample_start:variant.sample_end]))
+        #if
+        elif not (variant.type & extractor.IDENTITY):
+            description.append(var_to_rawvar(s1, s2, variant))
+
+        if variant.type & extractor.TRANSPOSITION_CLOSE:
+            in_transposition -= 1
+
+            if not in_transposition:
+                description.append(var_to_rawvar(s1, s2, variant, seq_list))
+        #if
+    #for
+
+    return description
+#describe_dna
+
+def describe_protein(s1, s2):
     """
     Give an allele description of the change from {s1} to {s2}.
 
@@ -579,83 +635,36 @@ def describe(s1, s2, dna=True):
     """
     description = Allele()
 
-    if not dna:
-        fs1, fs2 = make_fs_tables(1)
-        longest_fs_f = max(find_fs(s1, s2, fs1), find_fs(s1, s2, fs2))
-        longest_fs_r = max(find_fs(s2, s1, fs1), find_fs(s2, s1, fs2))
+    fs1, fs2 = make_fs_tables(1)
+    longest_fs_f = max(find_fs(s1, s2, fs1), find_fs(s1, s2, fs2))
+    longest_fs_r = max(find_fs(s2, s1, fs1), find_fs(s2, s1, fs2))
 
-        if longest_fs_f > longest_fs_r:
-            print s1[:longest_fs_f[1]], s1[longest_fs_f[1]:]
-            print s2[:len(s2) - longest_fs_f[0]], \
-                s2[len(s2) - longest_fs_f[0]:]
-            s1_part = s1[:longest_fs_f[1]]
-            s2_part = s2[:len(s2) - longest_fs_f[0]]
-            term = longest_fs_f[0]
-        #if
-        else:
-            print s1[:len(s1) - longest_fs_r[0]], \
-                s1[len(s1) - longest_fs_r[0]:]
-            print s2[:longest_fs_r[1]], s2[longest_fs_r[1]:]
-            s1_part = s1[:len(s1) - longest_fs_r[0]]
-            s2_part = s2[:longest_fs_r[1]]
-            term = len(s2) - longest_fs_r[1]
-        #else
-
-        s1_part = s1
-        s2_part = s2
-        for variant in extractor.extract(str(s1_part), len(s1_part),
-            str(s2_part), len(s2_part), 1):
-            description.append(var_to_rawvar(s1, s2, variant, container=ProteinVar))
-
-        if description:
-            description[-1].term = term + 2
-            description[-1].update()
-        #if
+    if longest_fs_f > longest_fs_r:
+        print s1[:longest_fs_f[1]], s1[longest_fs_f[1]:]
+        print s2[:len(s2) - longest_fs_f[0]], s2[len(s2) - longest_fs_f[0]:]
+        s1_part = s1[:longest_fs_f[1]]
+        s2_part = s2[:len(s2) - longest_fs_f[0]]
+        term = longest_fs_f[0]
     #if
-    else: # DNA description extraction, the only thing that `works'.
-        in_transposition = 0
-
-        for variant in extractor.extract(str(s1), len(s1), str(s2), len(s2),
-                0):
-            print variant.type, variant.reference_start, variant.reference_end, variant.sample_start, variant.sample_end, variant.transposition_start, variant.transposition_end
-            print variant.type & extractor.TRANSPOSITION_OPEN, variant.type & extractor.TRANSPOSITION_CLOSE 
-
-            if variant.type & extractor.TRANSPOSITION_OPEN:
-                if not in_transposition:
-                    seq_list = SeqList()
-                in_transposition += 1
-            #if
-
-            if in_transposition:
-                if variant.type & extractor.IDENTITY:
-                    seq_list.append(Seq(#reference=s1,
-                        start=variant.transposition_start + 1,
-                        end=variant.transposition_end, reverse=False))
-                elif variant.type & extractor.REVERSE_COMPLEMENT:
-                    seq_list.append(Seq(#reference=s1,
-                        start=variant.transposition_start + 1,
-                        end=variant.transposition_end, reverse=True))
-                else:
-                    seq_list.append(Seq(
-                        sequence=s2[variant.sample_start:variant.sample_end]))
-            #if
-            elif not (variant.type & extractor.IDENTITY):
-                description.append(var_to_rawvar(s1, s2, variant))
-
-            if variant.type & extractor.TRANSPOSITION_CLOSE:
-                in_transposition -= 1
-
-                if not in_transposition:
-                    description.append(var_to_rawvar(s1, s2, variant, seq_list))
-                #for i in seq_list:
-                #    print i.dump()
-            #if
-        #for
+    else:
+        print s1[:len(s1) - longest_fs_r[0]], s1[len(s1) - longest_fs_r[0]:]
+        print s2[:longest_fs_r[1]], s2[longest_fs_r[1]:]
+        s1_part = s1[:len(s1) - longest_fs_r[0]]
+        s2_part = s2[:longest_fs_r[1]]
+        term = len(s2) - longest_fs_r[1]
     #else
 
-    # Nothing happened.
-    if not description:
-        return Allele(RawVar())
+    s1_part = s1
+    s2_part = s2
+    for variant in extractor.extract(str(s1_part), len(s1_part),
+            str(s2_part), len(s2_part), 1):
+        description.append(var_to_rawvar(s1, s2, variant,
+            container=ProteinVar))
+
+    if description:
+        description[-1].term = term + 2
+        description[-1].update()
+    #if
 
     return description
-#describe
+#describe_protein
