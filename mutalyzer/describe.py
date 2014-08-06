@@ -279,12 +279,12 @@ def describe_dna(s1, s2):
     in_transposition = 0
 
     for variant in extractor.extract(str(s1), len(s1), str(s2), len(s2), 0):
-        print (variant.type, variant.reference_start,
-            variant.reference_end, variant.sample_start,
-            variant.sample_end, variant.transposition_start,
-            variant.transposition_end)
-        print (variant.type & extractor.TRANSPOSITION_OPEN, variant.type &
-            extractor.TRANSPOSITION_CLOSE)
+       # print (variant.type, variant.reference_start,
+       #     variant.reference_end, variant.sample_start,
+       #     variant.sample_end, variant.transposition_start,
+       #     variant.transposition_end)
+       # print (variant.type & extractor.TRANSPOSITION_OPEN, variant.type &
+       #     extractor.TRANSPOSITION_CLOSE)
 
         if variant.type & extractor.TRANSPOSITION_OPEN:
             if not in_transposition:
