@@ -18,7 +18,7 @@ from .. import variantchecker
 class MyEncoder(JSONEncoder):
     def default(self, o):
         json_object = o.__dict__
-        json_object.update({"hgvs": str(o)})
+        json_object.update({"hgvs": str(o), "weight": o.weight()})
 
         return json_object
     #default
@@ -123,9 +123,10 @@ def check_name(description):
         print described
         print described_protein
         #print "+++ %s" % O.getOutput("myTranscriptDescription")
-        print json.dumps({"reference_sequence": reference_sequence,
-            "sample_sequence": sample_sequence, "allele_description":
-            described_allele}, cls=MyEncoder)
+        print json.dumps({
+            #"reference_sequence": reference_sequence,
+            #"sample_sequence": sample_sequence,
+            "allele_description": described_allele}, cls=MyEncoder)
 
 
 def main():

@@ -138,7 +138,7 @@ class _RawVar(ComplexModel):
     inserted = Mandatory.String
     shift = Mandatory.Integer
     hgvs = Mandatory.String
-    hgvs_length = Mandatory.Integer
+    weight = Mandatory.Integer
 #_RawVar
 
 
