@@ -22,7 +22,7 @@ import os
 
 RELEASE = False
 
-__version_info__ = ('2', '0', 'beta-33')
+__version_info__ = ('2', '0', 'beta-34', 'dev')
 __date__ = '19 Aug 2014'
 
 
